@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin python
 
 # 2014-07-11 DHT22.py
 
