@@ -4,23 +4,39 @@ import time
 import datetime
 
 # Sensor connected to Raspberry Pi 3 pin 4
-DHT_PIN = 4
-LED_PIN = 17
+DHT_PIN = 17
+LED_PIN = 4
 
 # How long to wait between measurements.
 FREQUENCY_SEC = 3
 
 pi = pigpio.pi()
 
-s = DHT22.sensor(pi, DHT_PIN, LED_PIN)
-s.trigger()
+# filename = 'data.csv'
+# try:
+# 	file = open(filename, 'a')
+# except IOError:
+# 	file = open(filename, 'w')
 
-# delay time for pi to retrive data from the sensor
-time.sleep(0.1)
+while True:
+	s = DHT22.sensor(pi, DHT_PIN)
+	s.trigger()
+	# delay time for pi to retrive data from the sensor, running trigger()
+	time.sleep(0.2)
 
-# print datetime.datetime.now(), 'Temp={0:3.2f}*C  Humidity={1:0.1f}%'.format(s.temperature()/1., s.humidity()/1.)
-print datetime.datetime.now()
-print 'Temp=', s.temperature(), '*C'
-print 'Humidity=', s.humidity(), '%'
+	h = s.humidity()
+	t = s.temperature()
 
-s.cancel()
+	# verify if reading is valid
+	if h is None or t is None:
+		print 'invalid reading, retrying...'
+		time.sleep(2)
+		continue
+
+	timestamp = datetime.datetime.now()
+	print timestamp, 'Temp={0:0.1f}*C, Humidity={1:0.1f}%'.format(t/ 1., h/1.)
+
+
+	# capture sensor data every FREQUENCY_SEC
+	time.sleep(FREQUENCY_SEC)
+	s.cancel()
