@@ -1,14 +1,17 @@
+#!/usr/bin/python
+
 import pigpio
 import DHT22
 import time
 import datetime
+import logging
 
 # Sensor connected to Raspberry Pi 3 pin 4
 DHT_PIN = 17
 LED_PIN = 4
 
 # How long to wait between measurements.
-FREQUENCY_SEC = 3
+FREQUENCY_SEC = 30
 
 pi = pigpio.pi()
 
@@ -17,6 +20,12 @@ pi = pigpio.pi()
 # 	file = open(filename, 'a')
 # except IOError:
 # 	file = open(filename, 'w')
+
+logging.basicConfig(
+    filename="temp_humidity.log",
+    level=logging.INFO,
+    format="%(asctime)s:%(message)s"
+    )
 
 while True:
 	s = DHT22.sensor(pi, DHT_PIN)
@@ -35,7 +44,7 @@ while True:
 
 	timestamp = datetime.datetime.now()
 	print timestamp, 'Temp={0:0.1f}*C, Humidity={1:0.1f}%'.format(t/ 1., h/1.)
-
+        logging.info("Temp={0:0.1f}*C, Humidity={1:0.1f}%".format(t/ 1., h/ 1.))
 
 	# capture sensor data every FREQUENCY_SEC
 	time.sleep(FREQUENCY_SEC)
